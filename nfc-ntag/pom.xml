@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.smartrac.nfc</groupId>
+    <artifactId>nfc-ntag</artifactId>
+    <version>1.1</version>
+
+    <name>SMARTRAC SDK for Android NFC NTAG</name>
+    <description>NFC NTAG API for Android</description>
+    <inceptionYear>2015</inceptionYear>
+    <url>https://www.smart-cosmos.com</url>
+    <organization>
+        <name>Smartrac Technology Fletcher, Inc.</name>
+        <url>http://www.smartrac-group.com</url>
+    </organization>
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+            <distribution>repo</distribution>
+            <comments>Copyright (C) 2013 - 2015 Smartrac Technology Fletcher, Inc.</comments>
+        </license>
+    </licenses>
+    <developers>
+        <developer>
+            <id>cloud.engineering</id>
+            <name>SMARTRAC API Team</name>
+            <email>api@smartrac-group.com</email>
+            <organization>Smartrac Technology Fletcher, Inc.</organization>
+            <roles>
+                <role>Project Lead</role>
+            </roles>
+        </developer>
+    </developers>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.google.android</groupId>
+            <artifactId>android</artifactId>
+            <version>4.1.1.4</version>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>findbugs-maven-plugin</artifactId>
+                    <version>3.0.0</version>
+                    <configuration>
+                        <!--
+                            Enables analysis which takes more memory but finds more bugs.
+                            If you run out of memory, changes the value of the effort element
+                            to 'Low'.
+                        -->
+                        <effort>Max</effort>
+                        <!-- Reports all bugs (other values are medium and max) -->
+                        <threshold>Low</threshold>
+                        <!-- Produces XML report -->
+                        <xmlOutput>true</xmlOutput>
+                        <!-- Configures the directory in which the XML report is created -->
+                        <findbugsXmlOutputDirectory>${project.build.directory}/findbugs</findbugsXmlOutputDirectory>
+
+                        <excludeFilterFile>${project.basedir}/src/findbugs/findbugs-exclude.xml</excludeFilterFile>
+                    </configuration>
+                    <executions>
+                        <!--
+                            Ensures that FindBugs inspects source code when project is compiled.
+                        -->
+                        <execution>
+                            <id>analyze-compile</id>
+                            <phase>compile</phase>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <plugin>
+                    <artifactId>maven-clean-plugin</artifactId>
+                    <version>2.3</version>
+                </plugin>
+
+            </plugins>
+        </pluginManagement>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.10.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadoc</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <additionalparam>-Xdoclint:none</additionalparam>
+                    <groups>
+                        <group>
+                            <title>SMARTRAC SDK for Android NFC NTAG</title>
+                            <packages>nfc-ntag</packages>
+                        </group>
+                    </groups>
+                    <show>protected</show>
+                    <nohelp>true</nohelp>
+                    <docfilessubdirs>true</docfilessubdirs>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>findbugs-maven-plugin</artifactId>
+                <version>3.0.0</version>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <version>1.8</version>
+                <configuration>
+                    <licenseName>smartrac</licenseName>
+                    <licenseResolver>${project.baseUri}/src/license</licenseResolver>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>first</id>
+                        <goals>
+                            <goal>update-file-header</goal>
+                        </goals>
+                        <phase>prepare-package</phase>
+                        <configuration>
+                            <processStartTag>*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*</processStartTag>
+                            <sectionDelimiter>===============================================================================</sectionDelimiter>
+                            <processEndTag>#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#</processEndTag>
+                            <includes>
+                                <include>**/*.java</include>
+                            </includes>
+                            <excludes>
+                                <exclude>**/package-info.java</exclude>
+                            </excludes>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+
+    </build>
+</project>

@@ -1,7 +1,7 @@
 ![Objects](https://s3-eu-west-1.amazonaws.com/api.smart-cosmos.com/images/smartrac_logo.jpg)
 
 # SMARTRAC SDK for Android NFC
-This GitHub repo contains the SMARTRAC SDK for Android NFC.
+This repository contains the SMARTRAC SDK for Android NFC.
 
 ## NfcNtag API
 

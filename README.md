@@ -30,6 +30,9 @@ The Netherlands
 
  - [How-to: Read data from NFC NTAG in Android](https://github.com/SMARTRACTECHNOLOGY-PUBLIC/smartrac-sdk-java-android-nfc/blob/master/nfc-ntag/How-to%20Read%20data%20from%20NFC%20NTAG.md "How-to: Read data from NFC NTAG in Android")
 
+## NfcIso15693 API
+The NfcIso15693 API implements the command sets for generic ISO15693 tags.
+
 ## Join SMART COSMOS
 Are you ready to become part of creating something really big? With SMART COSMOS
 you can connect a universe of everyday things to the digital world. In fact,

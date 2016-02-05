@@ -1,5 +1,5 @@
 SMARTRAC SDK
-(C) Copyright 2015, Smartrac Technology Fletcher, Inc.
+(C) Copyright 2016, Smartrac Technology Fletcher, Inc.
 267 Cane Creek Rd, Fletcher, NC, 28732, USA
 All Rights Reserved.
 

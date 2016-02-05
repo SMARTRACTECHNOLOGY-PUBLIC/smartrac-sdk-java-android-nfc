@@ -4,10 +4,10 @@ package com.smartrac.nfc;
  * *#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*
  * SMARTRAC SDK for Android NFC NTAG
  * ===============================================================================
- * Copyright (C) 2015 SMARTRAC TECHNOLOGY GROUP
+ * Copyright (C) 2016 SMARTRAC TECHNOLOGY GROUP
  * ===============================================================================
  * SMARTRAC SDK
- * (C) Copyright 2015, Smartrac Technology Fletcher, Inc.
+ * (C) Copyright 2016, Smartrac Technology Fletcher, Inc.
  * 267 Cane Creek Rd, Fletcher, NC, 28732, USA
  * All Rights Reserved.
  * 
@@ -90,11 +90,17 @@ public class NfcNtagVersion {
                         switch (versionBytes[6]) {
                             case STORAGE_NTAG1K:
                                 iMemSize = SIZE_NTAG1K;
-                                sNtagType = TYPE_NTAGI2C1K;
+                                if (versionBytes[5] > 1)
+                                    sNtagType = TYPE_NTAGI2CP1K;
+                                else
+                                    sNtagType = TYPE_NTAGI2C1K;
                                 break;
                             case STORAGE_NTAG2K:
                                 iMemSize = SIZE_NTAG2K;
-                                sNtagType = TYPE_NTAGI2C2K;
+                                if (versionBytes[5] > 1)
+                                    sNtagType = TYPE_NTAGI2CP2K;
+                                else
+                                    sNtagType = TYPE_NTAGI2C2K;
                                 break;
                             default:
                                 iMemSize = SIZE_UNKNOWN;
@@ -149,6 +155,8 @@ public class NfcNtagVersion {
     static final String TYPE_NTAG216F = "NTAG 216F";
     static final String TYPE_NTAGI2C1K = "NTAG I2C 1K";
     static final String TYPE_NTAGI2C2K = "NTAG I2C 2K";
+    static final String TYPE_NTAGI2CP1K = "NTAG I2C plus 1K";
+    static final String TYPE_NTAGI2CP2K = "NTAG I2C plus 2K";
     static final String TYPE_UNKNOWN = "unknown chip";
 
     private int iMemSize;

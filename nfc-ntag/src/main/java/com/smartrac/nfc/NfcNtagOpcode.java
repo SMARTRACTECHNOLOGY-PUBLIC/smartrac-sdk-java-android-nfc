@@ -4,10 +4,10 @@ package com.smartrac.nfc;
  * *#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*
  * SMARTRAC SDK for Android NFC NTAG
  * ===============================================================================
- * Copyright (C) 2015 SMARTRAC TECHNOLOGY GROUP
+ * Copyright (C) 2016 SMARTRAC TECHNOLOGY GROUP
  * ===============================================================================
  * SMARTRAC SDK
- * (C) Copyright 2015, Smartrac Technology Fletcher, Inc.
+ * (C) Copyright 2016, Smartrac Technology Fletcher, Inc.
  * 267 Cane Creek Rd, Fletcher, NC, 28732, USA
  * All Rights Reserved.
  * 

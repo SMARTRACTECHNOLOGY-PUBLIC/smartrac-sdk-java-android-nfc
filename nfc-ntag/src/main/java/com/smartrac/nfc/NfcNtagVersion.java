@@ -24,9 +24,6 @@ package com.smartrac.nfc;
  */
 
 
-/**
- * Created by jbauer on 17.04.2015.
- */
 public class NfcNtagVersion {
 
     public static NfcNtagVersion fromGetVersion(byte[] getVersionBytes) {

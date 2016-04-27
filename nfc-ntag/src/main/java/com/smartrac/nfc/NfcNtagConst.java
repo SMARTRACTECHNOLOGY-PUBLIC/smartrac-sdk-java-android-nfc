@@ -24,9 +24,6 @@ package com.smartrac.nfc;
  */
 
 
-/**
- * Created by jbauer on 17.04.2015.
- */
 public class NfcNtagConst {
     public static final byte ACK = 0x0A;
     public static final byte NAK_INVALID_ARGUMENT = 0x00;

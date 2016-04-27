@@ -24,10 +24,6 @@ package com.smartrac.nfc;
  */
 
 
-/**
- * Created by jbauer on 17.04.2015.
- */
-
 import android.nfc.Tag;
 import android.nfc.tech.NfcA;
 import android.nfc.tech.TagTechnology;
@@ -43,7 +39,7 @@ public class NfcNtag implements TagTechnology {
 
     public NfcNtag(Tag tag) {
         nfca = NfcA.get(tag);
-        maxTranscieveLength = nfca.getMaxTransceiveLength();
+        maxTransceiveLength = nfca.getMaxTransceiveLength();
     }
 
     public void connect() throws IOException {
@@ -55,7 +51,7 @@ public class NfcNtag implements TagTechnology {
     }
     
     public int getMaxTransceiveLength() {
-        return maxTranscieveLength;
+        return maxTransceiveLength;
     }
     
     public Tag getTag() {
@@ -105,7 +101,7 @@ public class NfcNtag implements TagTechnology {
 
         boolean bOk = true;
         byte[] resp = new byte[4 * (endAddr - startAddr + 1)];
-        int maxReadLength = (maxTranscieveLength / 4) - 1;
+        int maxReadLength = (maxTransceiveLength / 4) - 1;
         if (maxReadLength < 1)
             return null;
         int iNumReads = 1 + (endAddr - startAddr + 1) / maxReadLength;
@@ -270,6 +266,45 @@ public class NfcNtag implements TagTechnology {
         return false;
     }
 
+    // MF UL-C AUTHENTICATE part 1
+    public byte[] mfulcAuth1() {
+        byte[] req = new byte[2];
+        byte[] resp;
+
+        req[0] = NfcNtagOpcode.MFULC_AUTH1;
+        req[1] = 0x00;
+
+        try {
+            resp = nfca.transceive(req);
+        } catch (IOException ex) {
+            resp = null;
+        }
+        return resp;	// result will be "AFh" + ekRndB
+    }
+
+    // MF UL-C AUTHENTICATE part 2
+    public byte[] mfulcAuth2(byte[] ekRndAB) {
+        if (ekRndAB == null) {
+            return null;
+        }
+        if (ekRndAB.length != 16) {
+            return null;
+        }
+
+        byte[] req = new byte[17];
+        byte[] resp;
+
+        req[0] = NfcNtagOpcode.MFULC_AUTH2;
+
+        try {
+            System.arraycopy(ekRndAB, 0, req, 1, 16);
+            resp = nfca.transceive(req);
+        } catch (IOException ex) {
+            return null;
+        }
+        return resp;	// result will be ekRndA'
+    }
+
     private NfcA nfca;
-    private int maxTranscieveLength;
+    private int maxTransceiveLength;
 }

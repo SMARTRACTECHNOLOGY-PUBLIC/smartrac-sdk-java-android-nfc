@@ -24,10 +24,6 @@ package com.smartrac.nfc;
  */
 
 
-/**
- * Created by jbauer on 17.04.2015.
- * This class represents the supported command codes for NXP NTAG chips
- */
 public class NfcNtagOpcode {
     public static final byte GET_VERSION = 0x60;
     public static final byte READ = 0x30;
@@ -37,4 +33,6 @@ public class NfcNtagOpcode {
     public static final byte PWD_AUTH = 0x1B;
     public static final byte READ_SIG = 0x3C;
     public static final byte SECTOR_SELECT = (byte) 0xC2;
+    public static final byte MFULC_AUTH1 = 0x1A;
+    public static final byte MFULC_AUTH2 = (byte) 0xAF;
 }

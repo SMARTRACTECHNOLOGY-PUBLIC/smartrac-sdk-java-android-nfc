@@ -4,7 +4,7 @@ package com.smartrac.nfc;
  * *#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*
  * SMARTRAC SDK for Android NFC NTAG
  * ===============================================================================
- * Copyright (C) 2016 SMARTRAC TECHNOLOGY GROUP
+ * Copyright (C) 2016 - 2017 Smartrac Technology Fletcher, Inc.
  * ===============================================================================
  * SMARTRAC SDK
  * (C) Copyright 2016, Smartrac Technology Fletcher, Inc.
@@ -23,17 +23,42 @@ package com.smartrac.nfc;
  * #*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#
  */
 
+import java.util.Arrays;
 
-public class NfcNtagOpcode {
-    public static final byte GET_VERSION = 0x60;
-    public static final byte READ = 0x30;
-    public static final byte FAST_READ = 0x3A;
-    public static final byte WRITE = (byte) 0xA2;
-    public static final byte READ_CNT = 0x39;
-    public static final byte PWD_AUTH = 0x1B;
-    public static final byte READ_SIG = 0x3C;
-    public static final byte SECTOR_SELECT = (byte) 0xC2;
-    public static final byte READ_TT_STATUS = (byte) 0xA4;
-    public static final byte MFULC_AUTH1 = 0x1A;
-    public static final byte MFULC_AUTH2 = (byte) 0xAF;
+public class NfcNtagTtStatus {
+
+    public static final byte STATE_CLOSED = 0x43;
+    public static final byte STATE_OPEN = 0x4F;
+    public static final byte STATE_INCORRECT = 0x49;
+
+    public NfcNtagTtStatus(byte[] ttStatusBytes) throws IllegalArgumentException {
+
+        if (ttStatusBytes.length != 5) {
+            throw new IllegalArgumentException("Read TT status response length must be 5");
+        }
+        message = new byte[4];
+        currentLoopState = ttStatusBytes[4];
+        System.arraycopy(ttStatusBytes, 0, message, 0, message.length);
+    }
+
+    public boolean isTampered() {
+
+        return !Arrays.equals(TT_INITIAL, message) || !(STATE_CLOSED == currentLoopState);
+    }
+
+    public byte[] getMessage() {
+
+        return message.clone();
+    }
+
+    public byte getCurrentLoopState() {
+
+         return currentLoopState;
+    }
+
+    private static final byte[] TT_INITIAL = {0x30, 0x30, 0x30, 0x30};
+
+    private byte[] message;
+
+    private byte currentLoopState;
 }

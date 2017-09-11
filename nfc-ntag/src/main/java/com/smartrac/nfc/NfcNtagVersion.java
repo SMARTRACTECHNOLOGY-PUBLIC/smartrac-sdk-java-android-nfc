@@ -51,7 +51,7 @@ public class NfcNtagVersion {
                             break;
                         case STORAGE_NTAG213:
                             iMemSize = SIZE_NTAG213;
-                            sNtagType = TYPE_NTAG213;
+                            sNtagType = versionBytes[4] == 3 ? TYPE_NTAG213TT : TYPE_NTAG213;
                             break;
                         case STORAGE_NTAG215:
                             iMemSize = SIZE_NTAG215;
@@ -146,6 +146,7 @@ public class NfcNtagVersion {
     static final String TYPE_NTAG210 = "NTAG 210";
     static final String TYPE_NTAG212 = "NTAG 212";
     static final String TYPE_NTAG213 = "NTAG 213";
+    static final String TYPE_NTAG213TT = "NTAG 213 TT";
     static final String TYPE_NTAG215 = "NTAG 215";
     static final String TYPE_NTAG216 = "NTAG 216";
     static final String TYPE_NTAG213F = "NTAG 213F";

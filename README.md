@@ -15,6 +15,7 @@ The NfcNtag API implements the command sets of following NXP chips:
  - NTAG 216
  - NTAG 213F
  - NTAG 216F
+ - NTAG 213TT
  - NTAG I2C 1K
  - NTAG I2C 2K
  - NTAG I2C plus 1K

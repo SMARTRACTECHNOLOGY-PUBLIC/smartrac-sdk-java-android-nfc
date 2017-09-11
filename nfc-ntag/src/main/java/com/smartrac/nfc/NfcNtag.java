@@ -266,6 +266,31 @@ public class NfcNtag implements TagTechnology {
         return false;
     }
 
+    // NTAG READ_TT_STATUS
+    public NfcNtagTtStatus readTtStatus() {
+        byte[] req = new byte[2];
+        byte[] resp;
+
+        req[0] = NfcNtagOpcode.READ_TT_STATUS;
+        req[1] = 0x00;
+
+        try {
+            resp = nfca.transceive(req);
+        } catch (IOException ex) {
+            return null;
+        }
+
+        NfcNtagTtStatus ttStatus;
+        try {
+            ttStatus = new NfcNtagTtStatus(resp);
+        } catch (IllegalArgumentException ex) {
+            return null;
+        }
+
+        return ttStatus;	// result will be the NTAG signature
+    }
+
+
     // MF UL-C AUTHENTICATE part 1
     public byte[] mfulcAuth1() {
         byte[] req = new byte[2];

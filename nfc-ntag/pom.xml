@@ -6,7 +6,7 @@
 
     <groupId>com.smartrac.nfc</groupId>
     <artifactId>nfc-ntag</artifactId>
-    <version>1.2</version>
+    <version>1.3</version>
 
     <name>SMARTRAC SDK for Android NFC NTAG</name>
     <description>NFC NTAG API for Android</description>

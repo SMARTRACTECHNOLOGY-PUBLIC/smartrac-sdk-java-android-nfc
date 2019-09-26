@@ -43,4 +43,12 @@ public class NfcIso15693Opcode
     public static final byte LOCK_DSFID = 0x2A;
     public static final byte GET_SYSTEM_INFORMATION = 0x2B;
     public static final byte GET_MULTIPLE_SECURITY = 0x2C;
+
+    // Extended commands
+    public static final byte EXT_READ_SINGLE = 0x30;
+    public static final byte EXT_WRITE_SINGLE = 0x31;
+    public static final byte EXT_LOCK = 0x32;
+    public static final byte EXT_READ_MULTIPLE = 0x33;
+    public static final byte EXT_WRITE_MULTIPLE = 0x34;
+    public static final byte EXT_GET_MULTIPLE_SECURITY = 0x3C;
 }

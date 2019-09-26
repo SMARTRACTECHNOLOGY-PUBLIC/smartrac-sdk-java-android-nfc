@@ -10,7 +10,7 @@ package com.smartrac.nfc;
  * (C) Copyright 2015, Smartrac Technology Fletcher, Inc.
  * 267 Cane Creek Rd, Fletcher, NC, 28732, USA
  * All Rights Reserved.
- *
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -63,17 +63,16 @@ public class NfcIso15693 implements TagTechnology {
     }
 
     public byte[] readSingleBlock(int block) {
-        byte[] param = new byte[1];
-        param[0] = (byte) block;
+        byte[] param = NfcIso15693.convertBlockToByteParam(block);
         try {
             byte[] resp = nfcv.transceive(
-                new NfcIso15693Command(NfcIso15693Opcode.READ_SINGLE, param).setAddressed(uid).toByteArray());
-            if (resp.length > 1) {
-                if (resp[0] == NfcIso15693Flags.RESP_OK) {
-                    byte[] ret = new byte[resp.length - 1];
-                    System.arraycopy(resp, 1, ret, 0, ret.length);
-                    return ret;
-                }
+                new NfcIso15693Command(param.length == 2 ? NfcIso15693Opcode.EXT_READ_SINGLE : NfcIso15693Opcode.READ_SINGLE, param)
+                    .setAddressed(uid)
+                    .toByteArray());
+            if (resp.length > 1 && resp[0] == NfcIso15693Flags.RESP_OK) {
+                byte[] ret = new byte[resp.length - 1];
+                System.arraycopy(resp, 1, ret, 0, ret.length);
+                return ret;
             }
             return null;
         } catch (IOException ex) {
@@ -82,53 +81,60 @@ public class NfcIso15693 implements TagTechnology {
     }
 
     public boolean writeSingleBlock(int block, byte[] data) {
-        byte[] param = new byte[1 + data.length];
-        param[0] = (byte) block;
-        System.arraycopy(data, 0, param, 1, data.length);
+        boolean isExtWrite = NfcIso15693.requiresExtBlockAdressing(block);
+        byte[] param = new byte[isExtWrite ? (2 + data.length) : (1 + data.length)];
+        param[0] = (byte)(block & 0xFF);
+        if (isExtWrite) {
+            param[1] = (byte)((block & 0xFF00) >> 8);
+        }
+        System.arraycopy(data, 0, param, isExtWrite ? 2 : 1, data.length);
         try {
             byte[] resp = nfcv.transceive(
-                new NfcIso15693Command(NfcIso15693Opcode.WRITE_SINGLE, param).setAddressed(uid).toByteArray());
-            if (resp.length == 1) {
-                if (resp[0] == NfcIso15693Flags.RESP_OK) {
-                    return true;
-                }
-            }
-            return false;
+                new NfcIso15693Command(isExtWrite ? NfcIso15693Opcode.EXT_WRITE_SINGLE : NfcIso15693Opcode.WRITE_SINGLE, param)
+                    .setAddressed(uid)
+                    .toByteArray());
+            return (resp.length == 1 && resp[0] == NfcIso15693Flags.RESP_OK);
         } catch (IOException ex) {
             return false;
         }
     }
 
     public boolean lockBlock(int block) {
-        byte[] param = new byte[1];
-        param[0] = (byte) block;
+        byte[] param = NfcIso15693.convertBlockToByteParam(block);
         try {
             byte[] resp = nfcv.transceive(
-                new NfcIso15693Command(NfcIso15693Opcode.LOCK, param).setAddressed(uid).toByteArray());
-            if (resp.length == 1) {
-                if (resp[0] == NfcIso15693Flags.RESP_OK) {
-                    return true;
-                }
-            }
-            return false;
+                new NfcIso15693Command(param.length == 2 ? NfcIso15693Opcode.EXT_LOCK : NfcIso15693Opcode.LOCK, param)
+                    .setAddressed(uid)
+                    .toByteArray());
+            return (resp.length == 1 && resp[0] == NfcIso15693Flags.RESP_OK);
         } catch (IOException ex) {
             return false;
         }
     }
 
     public byte[] readMultipleBlocks(int startBlock, int numBlocks) {
-        byte[] param = new byte[2];
-        param[0] = (byte) startBlock;
-        param[1] = (byte) (numBlocks - 1);
+        boolean isExtReadMultiple = NfcIso15693.requiresExtBlockAdressing(startBlock) || NfcIso15693.requiresExtBlockAdressing(numBlocks);
+        byte[] param;
+        if (isExtReadMultiple) {
+            param = new byte[4];
+            param[0] = (byte)(startBlock & 0xFF);
+            param[1] = (byte)((startBlock & 0xFF00) >> 8);
+            param[2] = (byte)((numBlocks - 1) & 0xFF);
+            param[3] = (byte)(((numBlocks - 1) & 0xFF00) >> 8);
+        } else {
+            param = new byte[2];
+            param[0] = (byte)startBlock;
+            param[1] = (byte)(numBlocks - 1);
+        }
         try {
             byte[] resp = nfcv.transceive(
-                new NfcIso15693Command(NfcIso15693Opcode.READ_MULTIPLE, param).setAddressed(uid).toByteArray());
-            if (resp.length > 1) {
-                if (resp[0] == NfcIso15693Flags.RESP_OK) {
-                    byte[] ret = new byte[resp.length - 1];
-                    System.arraycopy(resp, 1, ret, 0, ret.length);
-                    return ret;
-                }
+                new NfcIso15693Command(isExtReadMultiple ? NfcIso15693Opcode.EXT_READ_MULTIPLE : NfcIso15693Opcode.READ_MULTIPLE, param)
+                    .setAddressed(uid)
+                    .toByteArray());
+            if (resp.length > 1 && resp[0] == NfcIso15693Flags.RESP_OK) {
+                byte[] ret = new byte[resp.length - 1];
+                System.arraycopy(resp, 1, ret, 0, ret.length);
+                return ret;
             }
             return null;
         } catch (IOException ex) {
@@ -137,19 +143,27 @@ public class NfcIso15693 implements TagTechnology {
     }
 
     public boolean writeMultipleBlocks(int startBlock, int numBlocks, byte[] data) {
-        byte[] param = new byte[2 + data.length];
-        param[0] = (byte) startBlock;
-        param[1] = (byte) (numBlocks - 1);
-        System.arraycopy(data, 0, param, 2, data.length);
+        boolean isExtWriteMultiple = NfcIso15693.requiresExtBlockAdressing(startBlock) || NfcIso15693.requiresExtBlockAdressing(numBlocks);
+        byte[] param;
+        if (isExtWriteMultiple) {
+            param = new byte[4 + data.length];
+            param[0] = (byte)(startBlock & 0xFF);
+            param[1] = (byte)((startBlock & 0xFF00) >> 8);
+            param[2] = (byte)((numBlocks - 1) & 0xFF);
+            param[3] = (byte)(((numBlocks - 1) & 0xFF00) >> 8);
+            System.arraycopy(data, 0, param, 4, data.length);
+        } else {
+            param = new byte[2 + data.length];
+            param[0] = (byte)startBlock;
+            param[1] = (byte)(numBlocks - 1);
+            System.arraycopy(data, 0, param, 2, data.length);
+        }
         try {
             byte[] resp = nfcv.transceive(
-                new NfcIso15693Command(NfcIso15693Opcode.WRITE_MULTIPLE, param).setAddressed(uid).toByteArray());
-            if (resp.length == 1) {
-                if (resp[0] == NfcIso15693Flags.RESP_OK) {
-                    return true;
-                }
-            }
-            return false;
+                new NfcIso15693Command(isExtWriteMultiple ? NfcIso15693Opcode.EXT_WRITE_MULTIPLE : NfcIso15693Opcode.WRITE_MULTIPLE, param)
+                    .setAddressed(uid)
+                    .toByteArray());
+            return (resp.length == 1 && resp[0] == NfcIso15693Flags.RESP_OK);
         } catch (IOException ex) {
             return false;
         }
@@ -161,12 +175,7 @@ public class NfcIso15693 implements TagTechnology {
         try {
             byte[] resp = nfcv.transceive(
                 new NfcIso15693Command(NfcIso15693Opcode.WRITE_AFI, param).setAddressed(uid).toByteArray());
-            if (resp.length == 1) {
-                if (resp[0] == NfcIso15693Flags.RESP_OK) {
-                    return true;
-                }
-            }
-            return false;
+            return (resp.length == 1 && resp[0] == NfcIso15693Flags.RESP_OK);
         } catch (IOException ex) {
             return false;
         }
@@ -176,12 +185,7 @@ public class NfcIso15693 implements TagTechnology {
         try {
             byte[] resp = nfcv.transceive(
                 new NfcIso15693Command(NfcIso15693Opcode.LOCK_AFI).setAddressed(uid).toByteArray());
-            if (resp.length == 1) {
-                if (resp[0] == NfcIso15693Flags.RESP_OK) {
-                    return true;
-                }
-            }
-            return false;
+            return (resp.length == 1 && resp[0] == NfcIso15693Flags.RESP_OK);
         } catch (IOException ex) {
             return false;
         }
@@ -193,12 +197,7 @@ public class NfcIso15693 implements TagTechnology {
         try {
             byte[] resp = nfcv.transceive(
                 new NfcIso15693Command(NfcIso15693Opcode.WRITE_DSFID, param).setAddressed(uid).toByteArray());
-            if (resp.length == 1) {
-                if (resp[0] == NfcIso15693Flags.RESP_OK) {
-                    return true;
-                }
-            }
-            return false;
+            return (resp.length == 1 && resp[0] == NfcIso15693Flags.RESP_OK);
         } catch (IOException ex) {
             return false;
         }
@@ -208,12 +207,7 @@ public class NfcIso15693 implements TagTechnology {
         try {
             byte[] resp = nfcv.transceive(
                 new NfcIso15693Command(NfcIso15693Opcode.LOCK_DSFID).setAddressed(uid).toByteArray());
-            if (resp.length == 1) {
-                if (resp[0] == NfcIso15693Flags.RESP_OK) {
-                    return true;
-                }
-            }
-            return false;
+            return (resp.length == 1 && resp[0] == NfcIso15693Flags.RESP_OK);
         } catch (IOException ex) {
             return false;
         }
@@ -237,13 +231,24 @@ public class NfcIso15693 implements TagTechnology {
     }
 
     public byte[] getMultipleBlockSecurityStatus(int startBlock, int numBlocks) {
-        byte[] param = new byte[2];
-        param[0] = (byte) startBlock;
-        param[1] = (byte) (numBlocks - 1);
+        boolean isExtReadMultiple = NfcIso15693.requiresExtBlockAdressing(startBlock) || NfcIso15693.requiresExtBlockAdressing(numBlocks);
+        byte[] param;
+        if (isExtReadMultiple) {
+            param = new byte[4];
+            param[0] = (byte)(startBlock & 0xFF);
+            param[1] = (byte)((startBlock & 0xFF00) >> 8);
+            param[2] = (byte)((numBlocks - 1) & 0xFF);
+            param[3] = (byte)(((numBlocks - 1) & 0xFF00) >> 8);
+        } else {
+            param = new byte[2];
+            param[0] = (byte)startBlock;
+            param[1] = (byte)(numBlocks - 1);
+        }
         try {
             byte[] resp = nfcv.transceive(
-                new NfcIso15693Command(NfcIso15693Opcode.GET_MULTIPLE_SECURITY, param)
-                    .setAddressed(uid).toByteArray());
+                new NfcIso15693Command(isExtReadMultiple ? NfcIso15693Opcode.EXT_GET_MULTIPLE_SECURITY : NfcIso15693Opcode.GET_MULTIPLE_SECURITY, param)
+                    .setAddressed(uid)
+                    .toByteArray());
             if (resp.length > 1) {
                 if (resp[0] == NfcIso15693Flags.RESP_OK) {
                     byte[] ret = new byte[resp.length - 1];
@@ -263,6 +268,23 @@ public class NfcIso15693 implements TagTechnology {
         } catch (IOException ex) {
             return null;
         }
+    }
+
+    private static byte[] convertBlockToByteParam(int block) {
+        byte[] result;
+        if (NfcIso15693.requiresExtBlockAdressing(block)) {
+            result = new byte[2];
+            result[0] = (byte)(block & 0xFF);
+            result[1] = (byte)((block & 0xFF00) >> 8);
+        } else {
+            result = new byte[1];
+            result[0] = (byte)(block & 0xFF);
+        }
+        return result;
+    }
+
+    private static boolean requiresExtBlockAdressing(int block) {
+        return block > 200;
     }
 
     private byte[] uid;

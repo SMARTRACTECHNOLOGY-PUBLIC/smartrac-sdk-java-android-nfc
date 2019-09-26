@@ -6,7 +6,7 @@
 
     <groupId>com.smartrac.nfc</groupId>
     <artifactId>nfc-iso15693</artifactId>
-    <version>1.2-rc.1</version>
+    <version>1.2.0</version>
 
     <name>SMARTRAC SDK for Android NFC ISO15693</name>
     <description>NFC ISO15693 API for Android</description>
